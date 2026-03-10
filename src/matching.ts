@@ -223,7 +223,7 @@ export function maxWeightMatching(
     bestedge[w] = bestedge[b] = -1;
     if (t === 1) {
       // b became an S-vertex/blossom; add it(s vertices) to the queue.
-      queue.push(...blossomLeaves(b));
+      for (const v of blossomLeaves(b)) queue.push(v);
     } else if (t === 2) {
       // b became a T-vertex/blossom; assign label S to its mate.
       // (If b is a non-trivial blossom, its base is the only vertex
@@ -332,6 +332,8 @@ export function maxWeightMatching(
     }
     // Compute blossombestedges[b].
     const bestedgeto: number[] = new Array(2 * nvertex).fill(-1);
+    const bestslackto: number[] = new Array(2 * nvertex);
+    const touched: number[] = [];
     for (const bv of path) {
       let nblists: number[][];
       if (blossombestedges[bv] === null) {
@@ -354,12 +356,13 @@ export function maxWeightMatching(
             j = tmp;
           }
           const bj = inblossom[j];
-          if (
-            bj !== b &&
-            label[bj] === 1 &&
-            (bestedgeto[bj] === -1 || slack(k) < slack(bestedgeto[bj]))
-          ) {
-            bestedgeto[bj] = k;
+          if (bj !== b && label[bj] === 1) {
+            const kslack = slack(k);
+            if (bestedgeto[bj] === -1 || kslack < bestslackto[bj]) {
+              if (bestedgeto[bj] === -1) touched.push(bj);
+              bestedgeto[bj] = k;
+              bestslackto[bj] = kslack;
+            }
           }
         }
       }
@@ -367,14 +370,20 @@ export function maxWeightMatching(
       blossombestedges[bv] = null;
       bestedge[bv] = -1;
     }
-    blossombestedges[b] = bestedgeto.filter((k) => k !== -1);
-    // Select bestedge[b].
+    const newbestedges: number[] = new Array(touched.length);
     bestedge[b] = -1;
-    for (const k of blossombestedges[b]!) {
-      if (bestedge[b] === -1 || slack(k) < slack(bestedge[b])) {
+    let bestSlack = 0;
+    for (let idx = 0; idx < touched.length; idx++) {
+      const bj = touched[idx];
+      const k = bestedgeto[bj];
+      newbestedges[idx] = k;
+      if (bestedge[b] === -1 || bestslackto[bj] < bestSlack) {
         bestedge[b] = k;
+        bestSlack = bestslackto[bj];
       }
+      bestedgeto[bj] = -1; // reset for next use
     }
+    blossombestedges[b] = newbestedges;
   }
 
   // Expand the given top-level blossom.
@@ -890,7 +899,7 @@ export function maxWeightMatching(
         expandBlossom(deltablossom, false);
       }
 
-      // End of a this substage.
+      // End of this substage.
     }
 
     // Stop when no more augmenting path can be found.

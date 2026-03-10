@@ -1,6 +1,6 @@
 {
   "name": "maximum-weight-matching",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Maximum weight matching in general graphs using Edmonds' blossom algorithm",
   "type": "module",
   "main": "./dist/index.cjs",
