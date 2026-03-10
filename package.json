@@ -34,6 +34,15 @@
     "graph",
     "edmonds"
   ],
+  "author": "Daniel Sousa <npmjs.com@daniel.sousa.me>",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/daniel-sousa-me/maximum-weight-matching.git"
+  },
+  "homepage": "https://github.com/daniel-sousa-me/maximum-weight-matching#readme",
+  "bugs": {
+    "url": "https://github.com/daniel-sousa-me/maximum-weight-matching/issues"
+  },
   "license": "GPL-3.0",
   "devDependencies": {
     "tsup": "^8.0.0",
